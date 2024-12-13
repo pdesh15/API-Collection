@@ -1,0 +1,3605 @@
+{
+	"info": {
+		"_postman_id": "2068d23c-3845-4c09-b7c1-5e4771f89c10",
+		"name": "Alpha OneRLD subset checks",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14426843",
+		"_collection_link": "https://solar-shadow-896910.postman.co/workspace/aabbbd6b-3012-4b9e-8f22-8aa975b28af1/collection/14426843-2068d23c-3845-4c09-b7c1-5e4771f89c10?action=share&source=collection_link&creator=14426843"
+	},
+	"item": [
+		{
+			"name": "Authentication and Authorization",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();  \r",
+							"pm.collectionVariables.set(\"token\", jsonData.token);\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-forwarded-for",
+						"value": "152.58.201.217",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n \"email\": \"nkumar@eigenrisk.com\",\r\n  \"apiKey\": \"789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/apiLogin",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"apiLogin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n        \"AssetModel\": \"ERBASICS\",\r\n        \"FilterList\": [\r\n          {\r\n            \"AndOr\": \"AND\",\r\n            \"FilterList\": [\r\n              {\r\n                \"AssetType\": \"Site\",\r\n                \"Attribute\": \"Cause Of Loss\",\r\n                \"Operator\": \"EQ\",\r\n                \"Value\": \"EQXX\",\r\n                \"AndOr\": \"OR\"\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      },\r\n            \"quantile\": 50\r\n            \r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for \"Asset Count\"\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(7);\r",
+							"  console.log(\"Asset Count Value is matching. Expected: 7, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"#Contracts\"\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(7);\r",
+							"  console.log(\"#Contracts Value is matching. Expected: 7, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"TIV\"\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(21911902);\r",
+							"  console.log(\"TIV Value is matching. Expected: 21911902, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Gross Exposed Limit\"\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(20410306.933563266.toFixed(4));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching. Expected: 20410306.933563266, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"GroundUpLoss\"\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"ContractLoss_Value All Types_GL\"\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Exposed Limit\"\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(20410306.933563266.toFixed(4));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 20410306.933563266, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Loss\"\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(20410306.933563266.toFixed(4));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 20410306.933563266, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Loss\"\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac loss\"\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Exposed Limit\"\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Loss\"\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tiv/Status Copy 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"//const data1 = JSON(responseJson);\r",
+							" console.log(\"--------TIV BY Status--------\") \r",
+							"// Assertion for Percentage in TIV Range === <1M\r",
+							"pm.test(\"Validating Contribution Widget \", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Status\"] === \"Active\");\r",
+							"    pm.expect(StatusIs[\"Percentage\"]).to.eql(100);\r",
+							"    console.log(\"Percentage for TIV Range === <1M is matching. Expected: 100, Current: \", StatusIs[\"Percentage\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV in TIV Range === <1M\r",
+							"pm.test(\"Validating Contribution Widget \", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Status\"] === \"Active\");\r",
+							"    pm.expect(StatusIs[\"TIV\"]).to.eql(21911902);\r",
+							"    console.log(\"TIV for TIV Range === <1M is matching. Expected: 21911902, Current: \", StatusIs[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Status in TIV Range === <1M\r",
+							"pm.test(\"Validating Contribution Widget \", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Status\"] === \"Active\");\r",
+							"    pm.expect(StatusIs[\"Status\"]).to.eql(\"Active\");\r",
+							"    console.log(\"Status for TIV Range === <1M is matching. Expected: 'Active', Current: \", StatusIs[\"Status\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"GroupByMeasures\": [\r\n        \"TIV\"\r\n    ],\r\n    \"GroupByAttributes\": [\r\n        \"Status\"\r\n    ],\r\n    \"includeAllBins\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/get-contribution-details",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"get-contribution-details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD status is active",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQSH\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Status\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"Active\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for \"Asset Count\"\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(7);\r",
+							"  console.log(\"Asset Count Value is matching. Expected: 7, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"#Contracts\"\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(7);\r",
+							"  console.log(\"#Contracts Value is matching. Expected: 7, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"TIV\"\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(21911902);\r",
+							"  console.log(\"TIV Value is matching. Expected: 21911902, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Gross Exposed Limit\"\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(20410306.933563266.toFixed(4));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching. Expected: 20410306.933563266, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"GroundUpLoss\"\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"ContractLoss_Value All Types_GL\"\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Exposed Limit\"\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(20410306.933563266.toFixed(4));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 20410306.933563266, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Loss\"\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(20410306.933563266.toFixed(4));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 20410306.933563266, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Loss\"\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac loss\"\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Exposed Limit\"\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Loss\"\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD status is Underwriting",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQSH\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Status\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"UnderwritingRequired\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary underwriting",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for \"Asset Count\"\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(0);\r",
+							"  console.log(\"Asset Count Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"#Contracts\"\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(0);\r",
+							"  console.log(\"#Contracts Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"TIV\"\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(0);\r",
+							"  console.log(\"TIV Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Gross Exposed Limit\"\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Gross Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"GroundUpLoss\"\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"ContractLoss_Value All Types_GL\"\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Exposed Limit\"\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Loss\"\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Loss\"\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac loss\"\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Exposed Limit\"\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Loss\"\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tiv/Status Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"//const data1 = JSON(responseJson);\r",
+							" console.log(\"--------TIV BY Status--------\") \r",
+							"\r",
+							"pm.test(\"Validating Contribution Widget \", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Status\"] === \"UnderwritingRequired\");\r",
+							"    pm.expect(StatusIs).to.be.undefined;\r",
+							"    console.log(\"Status 'UnderwritingRequired' found in the response.\");\r",
+							"});\r",
+							"pm.test(\"Validating Contribution Widget \", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Status\"] === \"Active\");\r",
+							"    pm.expect(StatusIs).to.be.undefined;\r",
+							"    console.log(\"Status 'Active' found in the response.\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"GroupByMeasures\": [\r\n        \"TIV\"\r\n    ],\r\n    \"GroupByAttributes\": [\r\n        \"Status\"\r\n    ],\r\n    \"includeAllBins\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/get-contribution-details",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"get-contribution-details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD status is UnderwritingRequired",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"TCWI\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Status\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"UnderwritingRequired\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for \"#Contracts\"\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(481);\r",
+							"  console.log(\"#Contracts Value is matching. Expected: 481, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Asset Count\"\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(481);\r",
+							"  console.log(\"Asset Count Value is matching. Expected: 481, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"TIV\"\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(436217730);\r",
+							"  console.log(\"TIV Value is matching. Expected: 436217730, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Gross Exposed Limit\"\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(419964298.22329247);\r",
+							"  console.log(\"Gross Exposed Limit Value is matching. Expected: 419964298.22329247, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"GroundUpLoss\"\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"ContractLoss_Value All Types_GL\"\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Exposed Limit\"\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]).to.eql(419964298.22329247);\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 419964298.22329247, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Loss\"\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(419964298.22329247);\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 419964298.22329247, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Loss\"\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac loss\"\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Exposed Limit\"\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Loss\"\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Underlying Loss\"\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"]).to.eql(1.6792409902767998e-303);\r",
+							"  console.log(\"Underlying Loss Value is matching. Expected: 1.6792409902767998e-303, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tiv/Status",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"//const data1 = JSON(responseJson);\r",
+							" console.log(\"--------TIV BY Status--------\") \r",
+							"\r",
+							"pm.test(\"Validating Contribution Widget Sample Sov With Historical  Event  Percentage for TIV Range === <1M\", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Status\"] === \"UnderwritingRequired\");\r",
+							"    pm.expect(StatusIs[\"Percentage\"]).to.eql(100);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating Contribution Widget Sample Sov With Historical  Event  TIV for TIV Range === <1M\", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Status\"] === \"UnderwritingRequired\");\r",
+							"    pm.expect(StatusIs[\"TIV\"]).to.eql(429824030);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating Contribution Widget Sample Sov With Historical  Event  TIV Range for TIV Range === <1M\", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Status\"] === \"UnderwritingRequired\");\r",
+							"    pm.expect(StatusIs[\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"GroupByMeasures\": [\r\n        \"TIV\"\r\n    ],\r\n    \"GroupByAttributes\": [\r\n        \"Status\"\r\n    ],\r\n    \"includeAllBins\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/get-contribution-details",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"get-contribution-details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Top 20 Assets Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the first row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of First Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[0][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Miss Matching In First Row. Expected: 1. Current:\", responseJson.Value.Analysis0[0][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[0][\"Asset Name\"]).to.eql(\"1081656\");\r",
+							"  console.log(\"Asset Name Miss Matching In First Row. Expected: 1081656. Current:\", responseJson.Value.Analysis0[0][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[0][\"ContractLoss_Value All Types_EL\"]).to.eql(5158500.006068498);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Miss Matching In First Row. Expected: 5158500.006068498. Current:\", responseJson.Value.Analysis0[0][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[0][\"TIV\"]).to.eql(5430000);\r",
+							"  console.log(\"TIV Miss Matching In First Row. Expected: 5430000. Current:\", responseJson.Value.Analysis0[0][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[0][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Miss Matching In First Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[0][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the second row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Second Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[1][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Miss Matching In Second Row. Expected: 1. Current:\", responseJson.Value.Analysis0[1][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[1][\"Asset Name\"]).to.eql(\"1101516\");\r",
+							"  console.log(\"Asset Name Miss Matching In Second Row. Expected: 1101516. Current:\", responseJson.Value.Analysis0[1][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[1][\"ContractLoss_Value All Types_EL\"]).to.eql(4772467.505614366);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Miss Matching In Second Row. Expected: 4772467.505614366. Current:\", responseJson.Value.Analysis0[1][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[1][\"TIV\"]).to.eql(5023650);\r",
+							"  console.log(\"TIV Miss Matching In Second Row. Expected: 5023650. Current:\", responseJson.Value.Analysis0[1][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[1][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Miss Matching In Second Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[1][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the third row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Third Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[2][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Miss Matching In Third Row. Expected: 1. Current:\", responseJson.Value.Analysis0[2][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[2][\"Asset Name\"]).to.eql(\"1034550\");\r",
+							"  console.log(\"Asset Name Miss Matching In Third Row. Expected: 1034550. Current:\", responseJson.Value.Analysis0[2][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[2][\"ContractLoss_Value All Types_EL\"]).to.eql(4230000.010505319);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Miss Matching In Third Row. Expected: 4230000.010505319. Current:\", responseJson.Value.Analysis0[2][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[2][\"TIV\"]).to.eql(4700000);\r",
+							"  console.log(\"TIV Miss Matching In Third Row. Expected: 4700000. Current:\", responseJson.Value.Analysis0[2][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[2][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Miss Matching In Third Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[2][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the fourth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Fourth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[3][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Miss Matching In Fourth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[3][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[3][\"Asset Name\"]).to.eql(\"1109510\");\r",
+							"  console.log(\"Asset Name Miss Matching In Fourth Row. Expected: 1109510. Current:\", responseJson.Value.Analysis0[3][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[3][\"ContractLoss_Value All Types_EL\"]).to.eql(3895000.004582107);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Miss Matching In Fourth Row. Expected: 3895000.004582107. Current:\", responseJson.Value.Analysis0[3][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[3][\"TIV\"]).to.eql(4100000);\r",
+							"  console.log(\"TIV Miss Matching In Fourth Row. Expected: 4100000. Current:\", responseJson.Value.Analysis0[3][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[3][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Miss Matching In Fourth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[3][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the fifth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Fifth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[4][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Miss Matching In Fifth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[4][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[4][\"Asset Name\"]).to.eql(\"946250\");\r",
+							"  console.log(\"Asset Name Miss Matching In Fifth Row. Expected: 946250. Current:\", responseJson.Value.Analysis0[4][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[4][\"ContractLoss_Value All Types_EL\"]).to.eql(3969000.001810491);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Miss Matching In Fifth Row. Expected: 3969000.001810491. Current:\", responseJson.Value.Analysis0[4][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[4][\"TIV\"]).to.eql(4050000);\r",
+							"  console.log(\"TIV Miss Matching In Fifth Row. Expected: 4050000. Current:\", responseJson.Value.Analysis0[4][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[4][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Miss Matching In Fifth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[4][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the sixth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Sixth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[5][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Miss Matching In Sixth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[5][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[5][\"Asset Name\"]).to.eql(\"1140143\");\r",
+							"  console.log(\"Asset Name Miss Matching In Sixth Row. Expected: 1140143. Current:\", responseJson.Value.Analysis0[5][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[5][\"ContractLoss_Value All Types_EL\"]).to.eql(3439389.5040461235);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Miss Matching In Sixth Row. Expected: 3439389.5040461235. Current:\", responseJson.Value.Analysis0[5][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[5][\"TIV\"]).to.eql(3620410);\r",
+							"  console.log(\"TIV Miss Matching In Sixth Row. Expected: 3620410. Current:\", responseJson.Value.Analysis0[5][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[5][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Miss Matching In Sixth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[5][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the seventh row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Seventh Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[6][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Miss Matching In Seventh Row. Expected: 1. Current:\", responseJson.Value.Analysis0[6][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[6][\"Asset Name\"]).to.eql(\"1038050\");\r",
+							"  console.log(\"Asset Name Miss Matching In Seventh Row. Expected: 1038050. Current:\", responseJson.Value.Analysis0[6][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[6][\"ContractLoss_Value All Types_EL\"]).to.eql(3528000.0016093254);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Miss Matching In Seventh Row. Expected: 3528000.0016093254. Current:\", responseJson.Value.Analysis0[6][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[6][\"TIV\"]).to.eql(3600000);\r",
+							"  console.log(\"TIV Miss Matching In Seventh Row. Expected: 3600000. Current:\", responseJson.Value.Analysis0[6][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[6][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Miss Matching In Seventh Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[6][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the eighth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Eighth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[7][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Miss Matching In Eighth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[7][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[7][\"Asset Name\"]).to.eql(\"1012717\");\r",
+							"  console.log(\"Asset Name Miss Matching In Eighth Row. Expected: 1012717. Current:\", responseJson.Value.Analysis0[7][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[7][\"ContractLoss_Value All Types_EL\"]).to.eql(3273200.0014930964);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Miss Matching In Eighth Row. Expected: 3273200.0014930964. Current:\", responseJson.Value.Analysis0[7][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[7][\"TIV\"]).to.eql(3340000);\r",
+							"  console.log(\"TIV Miss Matching In Eighth Row. Expected: 3340000. Current:\", responseJson.Value.Analysis0[7][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[7][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Miss Matching In Eighth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[7][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the ninth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Ninth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[8][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Miss Matching In Ninth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[8][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[8][\"Asset Name\"]).to.eql(\"1170781\");\r",
+							"  console.log(\"Asset Name Miss Matching In Ninth Row. Expected: 1170781. Current:\", responseJson.Value.Analysis0[8][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[8][\"ContractLoss_Value All Types_EL\"]).to.eql(3158750.003715977);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Miss Matching In Ninth Row. Expected: 3158750.003715977. Current:\", responseJson.Value.Analysis0[8][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[8][\"TIV\"]).to.eql(3325000);\r",
+							"  console.log(\"TIV Miss Matching In Ninth Row. Expected: 3325000. Current:\", responseJson.Value.Analysis0[8][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[8][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Miss Matching In Ninth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[8][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the tenth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Tenth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[9][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Miss Matching In Tenth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[9][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[9][\"Asset Name\"]).to.eql(\"914005\");\r",
+							"  console.log(\"Asset Name Miss Matching In Tenth Row. Expected: 914005. Current:\", responseJson.Value.Analysis0[9][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[9][\"ContractLoss_Value All Types_EL\"]).to.eql(3180100.001450628);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Miss Matching In Tenth Row. Expected: 3180100.001450628. Current:\", responseJson.Value.Analysis0[9][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[9][\"TIV\"]).to.eql(3245000);\r",
+							"  console.log(\"TIV Miss Matching In Tenth Row. Expected: 3245000. Current:\", responseJson.Value.Analysis0[9][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[9][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Miss Matching In Tenth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[9][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"AdditionalSortMeasure\": \"TIV\",\r\n    \"AttributeList\": [\r\n        \"Asset Number\",\r\n        \"Asset Name\",\r\n        \"ContractLoss_Value All Types_EL\",\r\n        \"TIV\",\r\n        \"Status\"\r\n    ],\r\n    \"TopNBy\": \"Status\",\r\n    \"SortDirection\": -1,\r\n    \"Count\": 20,\r\n    \"ContractMode\": false,\r\n    \"CompareMode\": false,\r\n    \"PercentageAttributes\": false,\r\n    \"TopNAssetsBy\": \"Status\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/topn",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"topn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Top 20 Assets Copy 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the first row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of First Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[0][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Matching In First Row. Expected: 1. Current:\", responseJson.Value.Analysis0[0][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[0][\"Asset Name\"]).to.eql(\"873819\");\r",
+							"  console.log(\"Asset Name Matching In First Row. Expected: 873819. Current:\", responseJson.Value.Analysis0[0][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[0][\"ContractLoss_Value All Types_EL\"]).to.eql(114000.00013411045);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Matching In First Row. Expected: 114000.00013411045. Current:\", responseJson.Value.Analysis0[0][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[0][\"TIV\"]).to.eql(120000);\r",
+							"  console.log(\"TIV Matching In First Row. Expected: 120000. Current:\", responseJson.Value.Analysis0[0][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[0][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Matching In First Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[0][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the second row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Second Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[1][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Matching In Second Row. Expected: 1. Current:\", responseJson.Value.Analysis0[1][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[1][\"Asset Name\"]).to.eql(\"873797\");\r",
+							"  console.log(\"Asset Name Matching In Second Row. Expected: 873797. Current:\", responseJson.Value.Analysis0[1][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[1][\"ContractLoss_Value All Types_EL\"]).to.eql(132300.0000603497);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Matching In Second Row. Expected: 132300.0000603497. Current:\", responseJson.Value.Analysis0[1][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[1][\"TIV\"]).to.eql(135000);\r",
+							"  console.log(\"TIV Matching In Second Row. Expected: 135000. Current:\", responseJson.Value.Analysis0[1][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[1][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Matching In Second Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[1][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the third row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Third Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[2][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Matching In Third Row. Expected: 1. Current:\", responseJson.Value.Analysis0[2][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[2][\"Asset Name\"]).to.eql(\"873548\");\r",
+							"  console.log(\"Asset Name Matching In Third Row. Expected: 873548. Current:\", responseJson.Value.Analysis0[2][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[2][\"ContractLoss_Value All Types_EL\"]).to.eql(196000.00008940697);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Matching In Third Row. Expected: 196000.00008940697. Current:\", responseJson.Value.Analysis0[2][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[2][\"TIV\"]).to.eql(200000);\r",
+							"  console.log(\"TIV Matching In Third Row. Expected: 200000. Current:\", responseJson.Value.Analysis0[2][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[2][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Matching In Third Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[2][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the fourth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Fourth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[3][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Matching In Fourth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[3][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[3][\"Asset Name\"]).to.eql(\"874234\");\r",
+							"  console.log(\"Asset Name Matching In Fourth Row. Expected: 874234. Current:\", responseJson.Value.Analysis0[3][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[3][\"ContractLoss_Value All Types_EL\"]).to.eql(503500.00059232116);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Matching In Fourth Row. Expected: 503500.00059232116. Current:\", responseJson.Value.Analysis0[3][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[3][\"TIV\"]).to.eql(530000);\r",
+							"  console.log(\"TIV Matching In Fourth Row. Expected: 530000. Current:\", responseJson.Value.Analysis0[3][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[3][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Matching In Fourth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[3][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the fifth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Fifth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[4][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Matching In Fifth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[4][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[4][\"Asset Name\"]).to.eql(\"873083\");\r",
+							"  console.log(\"Asset Name Matching In Fifth Row. Expected: 873083. Current:\", responseJson.Value.Analysis0[4][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[4][\"ContractLoss_Value All Types_EL\"]).to.eql(592900.0002704561);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Matching In Fifth Row. Expected: 592900.0002704561. Current:\", responseJson.Value.Analysis0[4][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[4][\"TIV\"]).to.eql(605000);\r",
+							"  console.log(\"TIV Matching In Fifth Row. Expected: 605000. Current:\", responseJson.Value.Analysis0[4][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[4][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Matching In Fifth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[4][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the sixth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Sixth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[5][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Matching In Sixth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[5][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[5][\"Asset Name\"]).to.eql(\"844118\");\r",
+							"  console.log(\"Asset Name Matching In Sixth Row. Expected: 844118. Current:\", responseJson.Value.Analysis0[5][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[5][\"ContractLoss_Value All Types_EL\"]).to.eql(565275.004211627);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Matching In Sixth Row. Expected: 565275.004211627. Current:\", responseJson.Value.Analysis0[5][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[5][\"TIV\"]).to.eql(753700);\r",
+							"  console.log(\"TIV Matching In Sixth Row. Expected: 753700. Current:\", responseJson.Value.Analysis0[5][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[5][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Matching In Sixth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[5][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the seventh row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Seventh Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[6][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Matching In Seventh Row. Expected: 1. Current:\", responseJson.Value.Analysis0[6][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[6][\"Asset Name\"]).to.eql(\"874512\");\r",
+							"  console.log(\"Asset Name Matching In Seventh Row. Expected: 874512. Current:\", responseJson.Value.Analysis0[6][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[6][\"ContractLoss_Value All Types_EL\"]).to.eql(902500.0010617077);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Matching In Seventh Row. Expected: 902500.0010617077. Current:\", responseJson.Value.Analysis0[6][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[6][\"TIV\"]).to.eql(950000);\r",
+							"  console.log(\"TIV Matching In Seventh Row. Expected: 950000. Current:\", responseJson.Value.Analysis0[6][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[6][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Matching In Seventh Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[6][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the eighth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Eighth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[7][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Matching In Eighth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[7][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[7][\"Asset Name\"]).to.eql(\"874673\");\r",
+							"  console.log(\"Asset Name Matching In Eighth Row. Expected: 874673. Current:\", responseJson.Value.Analysis0[7][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[7][\"ContractLoss_Value All Types_EL\"]).to.eql(955500.000435859);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Matching In Eighth Row. Expected: 955500.000435859. Current:\", responseJson.Value.Analysis0[7][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[7][\"TIV\"]).to.eql(975000);\r",
+							"  console.log(\"TIV Matching In Eighth Row. Expected: 975000. Current:\", responseJson.Value.Analysis0[7][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[7][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Matching In Eighth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[7][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the ninth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Ninth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[8][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Matching In Ninth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[8][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[8][\"Asset Name\"]).to.eql(\"873375\");\r",
+							"  console.log(\"Asset Name Matching In Ninth Row. Expected: 873375. Current:\", responseJson.Value.Analysis0[8][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[8][\"ContractLoss_Value All Types_EL\"]).to.eql(2082500.000949949);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Matching In Ninth Row. Expected: 2082500.000949949. Current:\", responseJson.Value.Analysis0[8][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[8][\"TIV\"]).to.eql(2125000);\r",
+							"  console.log(\"TIV Matching In Ninth Row. Expected: 2125000. Current:\", responseJson.Value.Analysis0[8][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[8][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Matching In Ninth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[8][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion and comment for Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status for the tenth row\r",
+							"pm.test(\"Validating Asset Number, Asset Name, ContractLoss_Value All Types_EL, TIV, and Status of Tenth Row\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[9][\"Asset Number\"]).to.eql(1);\r",
+							"  console.log(\"Asset Number Matching In Tenth Row. Expected: 1. Current:\", responseJson.Value.Analysis0[9][\"Asset Number\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[9][\"Asset Name\"]).to.eql(\"1226027\");\r",
+							"  console.log(\"Asset Name Matching In Tenth Row. Expected: 1226027. Current:\", responseJson.Value.Analysis0[9][\"Asset Name\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[9][\"ContractLoss_Value All Types_EL\"]).to.eql(23750.000027939677);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Matching In Tenth Row. Expected: 23750.000027939677. Current:\", responseJson.Value.Analysis0[9][\"ContractLoss_Value All Types_EL\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[9][\"TIV\"]).to.eql(25000);\r",
+							"  console.log(\"TIV Matching In Tenth Row. Expected: 25000. Current:\", responseJson.Value.Analysis0[9][\"TIV\"]);\r",
+							"\r",
+							"  pm.expect(responseJson.Value.Analysis0[9][\"Status\"]).to.eql(\"UnderwritingRequired\");\r",
+							"  console.log(\"Status Matching In Tenth Row. Expected: UnderwritingRequired. Current:\", responseJson.Value.Analysis0[9][\"Status\"]);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"AdditionalSortMeasure\": \"TIV\",\r\n    \"AttributeList\": [\r\n        \"Asset Number\",\r\n        \"Asset Name\",\r\n        \"ContractLoss_Value All Types_EL\",\r\n        \"TIV\",\r\n        \"Status\"\r\n    ],\r\n    \"TopNBy\": \"Status\",\r\n    \"SortDirection\": 1,\r\n    \"Count\": 20,\r\n    \"ContractMode\": false,\r\n    \"CompareMode\": false,\r\n    \"PercentageAttributes\": false,\r\n    \"TopNAssetsBy\": \"Status\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/topn",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"topn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD status is  Active",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"TCWI\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Status\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"Active\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary 2 Active",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for #Contracts\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(48645);\r",
+							"    console.log(\"#Contracts Value is matching. Expected: 48645, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(48645);\r",
+							"    console.log(\"Asset Count Value is matching. Expected: 48645, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(40353617185);\r",
+							"    console.log(\"TIV Value is matching. Expected: 40353617185, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(38953299994.65953);\r",
+							"    console.log(\"Gross Exposed Limit Value is matching. Expected: 38953299994.65953, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GroundUpLoss\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"    console.log(\"GroundUpLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"    console.log(\"ContractLoss_Value All Types_GL Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]).to.eql(38953299994.65953);\r",
+							"    console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 38953299994.65953, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net Pre Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(38953299994.65953);\r",
+							"    console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 38953299994.65953, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"    console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Underlying Loss\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"]).to.eql(4.969924970361685e-304);\r",
+							"    console.log(\"Underlying Loss Value is matching. Expected: 4.969924970361685e-304, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tiv/Status active",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"//const data1 = JSON(responseJson);\r",
+							" console.log(\"--------TIV BY Status--------\") \r",
+							"\r",
+							"pm.test(\"Validating Contribution Widget Sample Sov With Historical  Event  Percentage for Status === Active\", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Status\"] === \"Active\");\r",
+							"    pm.expect(StatusIs[\"Percentage\"]).to.eql(100);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating Contribution Widget Sample Sov With Historical  Event  TIV for Status === Active\", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Status\"] === \"Active\");\r",
+							"    pm.expect(StatusIs[\"TIV\"]).to.eql(40010386790);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating Contribution Widget Sample Sov With Historical  Event  TIV Range for Status === Active\", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Status\"] === \"Active\");\r",
+							"    pm.expect(StatusIs[\"Status\"]).to.eql(\"Active\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"GroupByMeasures\": [\r\n        \"TIV\"\r\n    ],\r\n    \"GroupByAttributes\": [\r\n        \"Status\"\r\n    ],\r\n    \"includeAllBins\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/get-contribution-details",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"get-contribution-details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD agent 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQSH\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Agent\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"AGY846\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for \"#Contracts\"\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(1);\r",
+							"  console.log(\"#Contracts Value is matching. Expected: 1, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Asset Count\"\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(1);\r",
+							"  console.log(\"Asset Count Value is matching. Expected: 1, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"TIV\"\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(1054450);\r",
+							"  console.log(\"TIV Value is matching. Expected: 1054450, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Gross Exposed Limit\"\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(1001727.5011784397.toFixed(4));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching. Expected: 1001727.5011784397, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"GroundUpLoss\"\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"ContractLoss_Value All Types_GL\"\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Exposed Limit\"\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(1001727.5011784397.toFixed(4));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 1001727.5011784397, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Loss\"\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(1001727.5011784397.toFixed(4));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 1001727.5011784397, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Loss\"\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac loss\"\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Exposed Limit\"\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Loss\"\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Underlying Loss\"\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"].toFixed(4)).to.eql(1.6911896368969835e-303.toFixed(4));\r",
+							"  console.log(\"Underlying Loss Value is matching. Expected: 1.6911896368969835e-303, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD agent 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQSH\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Agent\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"AGY251\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for \"#Contracts\"\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(1);\r",
+							"  console.log(\"#Contracts Value is matching. Expected: 1, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Asset Count\"\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(1);\r",
+							"  console.log(\"Asset Count Value is matching. Expected: 1, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"TIV\"\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(1700000);\r",
+							"  console.log(\"TIV Value is matching. Expected: 1700000, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Gross Exposed Limit\"\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(1615000.001899898);\r",
+							"  console.log(\"Gross Exposed Limit Value is matching. Expected: 1615000.001899898, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"GroundUpLoss\"\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"ContractLoss_Value All Types_GL\"\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Exposed Limit\"\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]).to.eql(1615000.001899898);\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 1615000.001899898, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Loss\"\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(1615000.001899898);\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 1615000.001899898, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Loss\"\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac loss\"\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Exposed Limit\"\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Loss\"\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Underlying Loss\"\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"]).to.eql(1.6903441088307507e-303);\r",
+							"  console.log(\"Underlying Loss Value is matching. Expected: 1.6903441088307507e-303, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tiv/agent",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"//const data1 = JSON(responseJson);\r",
+							" console.log(\"--------TIV BY Status--------\") \r",
+							"\r",
+							"// Assertion for Percentage for Status === Active\r",
+							"pm.test(\"Validating Contribution \", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Agent\"] === \"AGY251\");\r",
+							"    pm.expect(StatusIs[\"Percentage\"]).to.eql(100);\r",
+							"    console.log(\"Percentage for Status === Active is matching. Expected: 100, Current: \", StatusIs[\"Percentage\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV for Status === Active\r",
+							"pm.test(\"Validating Contribution \", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Agent\"] === \"AGY251\");\r",
+							"    pm.expect(StatusIs[\"TIV\"]).to.eql(28624571);\r",
+							"    console.log(\"TIV for Status === Active is matching. Expected: 28624571, Current: \", StatusIs[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Status for Status === Active\r",
+							"pm.test(\"Validating Contribution \", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Agent\"] === \"AGY251\");\r",
+							"    pm.expect(StatusIs[\"Agent\"]).to.eql(\"AGY251\");\r",
+							"    console.log(\"Agent for Status === Active is matching. Expected: 'AGY251', Current: \", StatusIs[\"Agent\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating Contribution Widget \", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Agent\"] === \"AGY678\");\r",
+							"    pm.expect(StatusIs).to.be.undefined;\r",
+							"    console.log(\"Status 'UnderwritingRequired' found in the response.\");\r",
+							"});\r",
+							"pm.test(\"Validating Contribution Widget \", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Agent\"] === \"AGY650\");\r",
+							"    pm.expect(StatusIs).to.be.undefined;\r",
+							"    console.log(\"Status 'Active' found in the response.\");\r",
+							"});\r",
+							"pm.test(\"Validating Contribution Widget \", () => {\r",
+							"    const StatusIs = responseJson.Value.Analysis0.find(item => item[\"Agent\"] === \"AGY272\");\r",
+							"    pm.expect(StatusIs).to.be.undefined;\r",
+							"    console.log(\"Status 'Active' found in the response.\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"GroupByMeasures\": [\r\n        \"TIV\"\r\n    ],\r\n    \"GroupByAttributes\": [\r\n        \"Agent\"\r\n    ],\r\n    \"includeAllBins\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/get-contribution-details",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"get-contribution-details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD LOB",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"TCWI\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"LOB\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"Personal\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for \"ActiveContractCount\"\r",
+							"pm.test(\"Validating ActiveContractCount\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ActiveContractCount\"]).to.eql(70055);\r",
+							"  console.log(\"ActiveContractCount Value is matching. Expected: 70055, Current: \", responseJson.Value.Analysis0[\"ActiveContractCount\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Analysis Currency\"\r",
+							"pm.test(\"Validating Analysis Currency\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Analysis Currency\"]).to.eql(\"USD\");\r",
+							"  console.log(\"Analysis Currency Value is matching. Expected: USD, Current: \", responseJson.Value.Analysis0[\"Analysis Currency\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"ContractLoss_Value All Types_EL\"\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_EL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_EL\"]).to.eql(55116482164.03592);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL Value is matching. Expected: 55116482164.03592, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_EL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Deductible\"\r",
+							"pm.test(\"Validating Deductible\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Deductible\"]).to.eql(1941053275.9640775);\r",
+							"  console.log(\"Deductible Value is matching. Expected: 1941053275.9640775, Current: \", responseJson.Value.Analysis0[\"Deductible\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"ExposedGrossLimit\"\r",
+							"pm.test(\"Validating ExposedGrossLimit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ExposedGrossLimit\"]).to.eql(55116482164.03592);\r",
+							"  console.log(\"ExposedGrossLimit Value is matching. Expected: 55116482164.03592, Current: \", responseJson.Value.Analysis0[\"ExposedGrossLimit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Gross Exposed Limit\"\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(55116482164.03592);\r",
+							"  console.log(\"Gross Exposed Limit Value is matching. Expected: 55116482164.03592, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Gross Loss\"\r",
+							"pm.test(\"Validating Gross Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Loss\"]).to.eql(0);\r",
+							"  console.log(\"Gross Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Gross Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Layer Premium\"\r",
+							"pm.test(\"Validating Layer Premium\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Layer Premium\"]).to.eql(462724138.64);\r",
+							"  console.log(\"Layer Premium Value is matching. Expected: 462724138.64, Current: \", responseJson.Value.Analysis0[\"Layer Premium\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Post Cat Exposed Limit\"\r",
+							"pm.test(\"Validating Net Post Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Post Cat Exposed Limit\"]).to.eql(55116482164.03592);\r",
+							"  console.log(\"Net Post Cat Exposed Limit Value is matching. Expected: 55116482164.03592, Current: \", responseJson.Value.Analysis0[\"Net Post Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Post Cat Loss\"\r",
+							"pm.test(\"Validating Net Post Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Post Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Post Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Post Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(55116482164.03592);\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 55116482164.03592, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Loss\"\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Reinsurance Gross Exposed Limit\"\r",
+							"pm.test(\"Validating Reinsurance Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Reinsurance Gross Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Reinsurance Gross Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Reinsurance Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Reinsurance Gross Loss\"\r",
+							"pm.test(\"Validating Reinsurance Gross Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Reinsurance Gross Loss\"]).to.eql(0);\r",
+							"  console.log(\"Reinsurance Gross Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Reinsurance Gross Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Exposed Limit\"\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Loss\"\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tiv/LOB",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"//const data1 = JSON(responseJson);\r",
+							" console.log(\"--------TIV BY Status--------\") \r",
+							"\r",
+							"// Assertion for Percentage for LOB === \"Personal\"\r",
+							"pm.test(\"Validating Contribution Percentage for LOB === 'Personal'\", () => {\r",
+							"    const contributionItem = responseJson.Value.Analysis0.find(item => item[\"LOB\"] === \"Personal\");\r",
+							"    pm.expect(contributionItem[\"Percentage\"]).to.eql(100);\r",
+							"    console.log(\"Percentage for LOB === 'Personal' is matching. Expected: 100, Current: \", contributionItem[\"Percentage\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV for LOB === \"Personal\"\r",
+							"pm.test(\"Validating Contribution TIV for LOB === 'Personal'\", () => {\r",
+							"    const contributionItem = responseJson.Value.Analysis0.find(item => item[\"LOB\"] === \"Personal\");\r",
+							"    pm.expect(contributionItem[\"TIV\"]).to.eql(57057535440);\r",
+							"    console.log(\"TIV for LOB === 'Personal' is matching. Expected: 57057535440, Current: \", contributionItem[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV for LOB === \"Personal\"\r",
+							"pm.test(\"Validating Contribution LOB for LOB === 'Personal'\", () => {\r",
+							"    const contributionItem = responseJson.Value.Analysis0.find(item => item[\"LOB\"] === \"Personal\");\r",
+							"    pm.expect(contributionItem[\"LOB\"]).to.eql(\"Personal\");\r",
+							"    console.log(\"TIV for LOB === 'Personal' is matching. Expected: LOB , Current: \", contributionItem[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"GroupByMeasures\": [\r\n        \"TIV\"\r\n    ],\r\n    \"GroupByAttributes\": [\r\n        \"LOB\"\r\n    ],\r\n    \"includeAllBins\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/get-contribution-details",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"get-contribution-details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD  State",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"TCWI\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"State\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"WY\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for \"Asset Count\"\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(4);\r",
+							"    console.log(\"Asset Count Value is matching. Expected: 4, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"#Contracts\"\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(4);\r",
+							"    console.log(\"#Contracts Value is matching. Expected: 4, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"TIV\"\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(11820000);\r",
+							"    console.log(\"TIV Value is matching. Expected: 11820000, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Gross Exposed Limit\"\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(11701800.002641976);\r",
+							"    console.log(\"Gross Exposed Limit Value is matching. Expected: 11701800.002641976, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"GroundUpLoss\"\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"    console.log(\"GroundUpLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"ContractLoss_Value All Types_GL\"\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"    console.log(\"ContractLoss_Value All Types_GL Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Exposed Limit\"\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]).to.eql(11701800.002641976);\r",
+							"    console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 11701800.002641976, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Loss\"\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net Pre Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(11701800.002641976);\r",
+							"    console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 11701800.002641976, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Loss\"\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac loss\"\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"    console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Exposed Limit\"\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Loss\"\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tiv/State",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"console.log('--------TIV BY Status--------')\r",
+							"\r",
+							"pm.test(\"Validating Contribution Percentage for State === WY\", () => {\r",
+							"    const contributionItem = responseJson.Value.Analysis0.find(item => item[\"State\"].code === \"WY\");\r",
+							"    pm.expect(contributionItem[\"Percentage\"]).to.eql(100);\r",
+							"    console.log(\"Percentage for LOB === 'Personal' is matching. Expected: 100, Current: \", contributionItem[\"Percentage\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test('Validating Contribution TIV for State === WY', () => {\r",
+							"    const contributionItem = responseJson.Value.Analysis0.find(item => item[\"State\"].code === \"WY\");\r",
+							"    pm.expect(contributionItem['TIV']).to.eql(11820000);\r",
+							"    console.log('TIV for State === WY is matching. Expected: 11820000, Current: ', contributionItem['TIV']);\r",
+							"})\r",
+							"\r",
+							"pm.test('Validating Contribution LOB for State === WY', () => {\r",
+							"    const contributionItem = responseJson.Value.Analysis0.find(item => item[\"State\"].code === \"WY\");\r",
+							"    pm.expect(contributionItem['State'].code).to.eql('WY');\r",
+							"    console.log('TIV for State === WY is matching. Expected: WY , Current: ', contributionItem['State'].code);\r",
+							"})\r",
+							"\r",
+							"pm.test('Validating Contribution LOB for State === WY', () => {\r",
+							"    const contributionItem = responseJson.Value.Analysis0.find(item => item[\"State\"].code === \"WY\");\r",
+							"    pm.expect(contributionItem['State'].displayName).to.eql('Wyoming');\r",
+							"    console.log('TIV for State === WY is matching. Expected: Wyoming , Current: ', contributionItem['State'].displayName);\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"GroupByMeasures\": [\r\n        \"TIV\"\r\n    ],\r\n    \"GroupByAttributes\": [\r\n        \"State\"\r\n    ],\r\n    \"includeAllBins\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/get-contribution-details",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"get-contribution-details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD  County",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"TCWI\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"County\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"Collier\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for \"#Contracts\"\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(1643);\r",
+							"    console.log(\"#Contracts Value is matching. Expected: 1643, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Asset Count\"\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(1643);\r",
+							"    console.log(\"Asset Count Value is matching. Expected: 1643, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"TIV\"\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(1812328508);\r",
+							"    console.log(\"TIV Value is matching. Expected: 1812328508, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Gross Exposed Limit\"\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(1727379990.1087475);\r",
+							"    console.log(\"Gross Exposed Limit Value is matching. Expected: 1727379990.1087475, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"GroundUpLoss\"\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"    console.log(\"GroundUpLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"ContractLoss_Value All Types_GL\"\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"    console.log(\"ContractLoss_Value All Types_GL Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Exposed Limit\"\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]).to.eql(1727379990.1087472);\r",
+							"    console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 1727379990.1087472, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Loss\"\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net Pre Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(1727379990.1087472);\r",
+							"    console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 1727379990.1087472, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Loss\"\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac loss\"\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"    console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Exposed Limit\"\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Loss\"\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tiv/State Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"console.log('--------TIV BY Status--------')\r",
+							"\r",
+							"pm.test('Validating Contribution Percentage for County === \\'Collier\\'', () => {\r",
+							"    const contributionItem = responseJson.Value.Analysis0.find(item => item['County'] === 'Collier');\r",
+							"    pm.expect(contributionItem['Percentage']).to.eql(100);\r",
+							"    console.log('Percentage for County === \\'Collier\\' is matching. Expected: 100, Current: ', contributionItem['Percentage']);\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Validating Contribution TIV for County === 'Collier'\", () => {\r",
+							"    const contributionItem = responseJson.Value.Analysis0.find(item => item[\"County\"] === \"Collier\");\r",
+							"    pm.expect(contributionItem[\"County\"]).to.eql('Collier');\r",
+							"    console.log(\"TIV for County === 'Collier' is matching. Expected: Collier, Current: \", contributionItem[\"County\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating Contribution TIV for County === 'Collier'\", () => {\r",
+							"    const contributionItem = responseJson.Value.Analysis0.find(item => item[\"County\"] === \"Collier\");\r",
+							"    pm.expect(contributionItem[\"County\"]).to.eql('Collier');\r",
+							"    console.log(\"TIV for County === 'Collier' is matching. Expected: Collier, Current: \", contributionItem[\"County\"]);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"GroupByMeasures\": [\r\n        \"TIV\"\r\n    ],\r\n    \"GroupByAttributes\": [\r\n        \"County\"\r\n    ],\r\n    \"includeAllBins\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/get-contribution-details",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"get-contribution-details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD  Inception Date",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"TCWI\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Inception Date\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": {\r\n                                    \"Day\": 17,\r\n                                    \"Month\": 1,\r\n                                    \"Year\": 2022\r\n                                },\r\n                                \"AndOr\": \"AND\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(107);\r",
+							"    console.log(\"Asset Count Value is matching. Expected: 107, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for #Contracts\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(107);\r",
+							"    console.log(\"#Contracts Value is matching. Expected: 107, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(94257239);\r",
+							"    console.log(\"TIV Value is matching. Expected: 94257239, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(90561061.33261602);\r",
+							"    console.log(\"Gross Exposed Limit Value is matching. Expected: 90561061.33261602, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GroundUpLoss\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"    console.log(\"GroundUpLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"    console.log(\"ContractLoss_Value All Types_GL Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]).to.eql(90561061.332616);\r",
+							"    console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 90561061.332616, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net Pre Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(90561061.332616);\r",
+							"    console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 90561061.332616, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"    console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n            \"Asset Count\",\r\n            \"#Contracts\",\r\n            \"TIV\",\r\n            \"Gross Exposed Limit\",\r\n            \"GroundUpLoss\",\r\n            \"ContractLoss_Value All Types_GL\",\r\n            \"Net Pre Cat Exposed Limit\",\r\n            \"Net Pre Cat Loss\",\r\n            \"Net of Fac Exposed Limit\",\r\n            \"Net of Fac Loss\",\r\n            \"Fac Exposed Limit\",\r\n            \"Fac loss\",\r\n            \"Treaty Exposed Limit\",\r\n            \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis oneRLD  Exipiration Date",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23209,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"TCWI\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    },\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Expiration Date\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": {\r\n                                    \"Day\": 5,\r\n                                    \"Month\": 11,\r\n                                    \"Year\": 2022\r\n                                },\r\n                                \"AndOr\": \"AND\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary Copy 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Assertion for #Contracts\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(136);\r",
+							"    console.log(\"#Contracts Value is matching. Expected: 136, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ActiveContractCount\r",
+							"pm.test(\"Validating ActiveContractCount\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"ActiveContractCount\"]).to.eql(136);\r",
+							"    console.log(\"ActiveContractCount Value is matching. Expected: 136, Current: \", responseJson.Value.Analysis0[\"ActiveContractCount\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Analysis Currency\r",
+							"pm.test(\"Validating Analysis Currency\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Analysis Currency\"]).to.eql(\"USD\");\r",
+							"    console.log(\"Analysis Currency Value is matching. Expected: USD, Current: \", responseJson.Value.Analysis0[\"Analysis Currency\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(136);\r",
+							"    console.log(\"Asset Count Value is matching. Expected: 136, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ContractLoss_Value All Types_EL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_EL\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_EL\"]).to.eql(114380995.5746081);\r",
+							"    console.log(\"ContractLoss_Value All Types_EL Value is matching. Expected: 114380995.5746081, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_EL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Deductible\r",
+							"pm.test(\"Validating Deductible\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Deductible\"]).to.eql(3785302.4253918957);\r",
+							"    console.log(\"Deductible Value is matching. Expected: 3785302.4253918957, Current: \", responseJson.Value.Analysis0[\"Deductible\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ExposedGrossLimit\r",
+							"pm.test(\"Validating ExposedGrossLimit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"ExposedGrossLimit\"]).to.eql(114380995.5746081);\r",
+							"    console.log(\"ExposedGrossLimit Value is matching. Expected: 114380995.5746081, Current: \", responseJson.Value.Analysis0[\"ExposedGrossLimit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"    console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(114380995.5746081);\r",
+							"    console.log(\"Gross Exposed Limit Value is matching. Expected: 114380995.5746081, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Loss\r",
+							"pm.test(\"Validating Gross Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Gross Loss\"]).to.eql(0);\r",
+							"    console.log(\"Gross Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Gross Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GrossLoss\r",
+							"pm.test(\"Validating GrossLoss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"GrossLoss\"]).to.eql(0);\r",
+							"    console.log(\"GrossLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GrossLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GroundUpLoss\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"    console.log(\"GroundUpLoss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Layer Premium\r",
+							"pm.test(\"Validating Layer Premium\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Layer Premium\"]).to.eql(706036.41);\r",
+							"    console.log(\"Layer Premium Value is matching. Expected: 706036.41, Current: \", responseJson.Value.Analysis0[\"Layer Premium\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Post Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Post Cat Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Post Cat Exposed Limit\"]).to.eql(114380995.57460812);\r",
+							"    console.log(\"Net Post Cat Exposed Limit Value is matching. Expected: 114380995.57460812, Current: \", responseJson.Value.Analysis0[\"Net Post Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Post Cat Loss\r",
+							"pm.test(\"Validating Net Post Cat Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Post Cat Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net Post Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Post Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]).to.eql(114380995.57460812);\r",
+							"    console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 114380995.57460812, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net Pre Cat Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(114380995.57460812);\r",
+							"    console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 114380995.57460812, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net of Fac Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Reinsurance Gross Exposed Limit\r",
+							"pm.test(\"Validating Reinsurance Gross Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Reinsurance Gross Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Reinsurance Gross Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Reinsurance Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Reinsurance Gross Loss\r",
+							"pm.test(\"Validating Reinsurance Gross Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Reinsurance Gross Loss\"]).to.eql(0);\r",
+							"    console.log(\"Reinsurance Gross Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Reinsurance Gross Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(118166298);\r",
+							"    console.log(\"TIV Value is matching. Expected: 118166298, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Underlying Loss\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"]).to.eql(1.6881635364494137e-303);\r",
+							"    console.log(\"Underlying Loss Value is matching. Expected: 1.6881635364494137e-303, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n            \"Asset Count\",\r\n            \"#Contracts\",\r\n            \"TIV\",\r\n            \"Gross Exposed Limit\",\r\n            \"GroundUpLoss\",\r\n            \"ContractLoss_Value All Types_GL\",\r\n            \"Net Pre Cat Exposed Limit\",\r\n            \"Net Pre Cat Loss\",\r\n            \"Net of Fac Exposed Limit\",\r\n            \"Net of Fac Loss\",\r\n            \"Fac Exposed Limit\",\r\n            \"Fac loss\",\r\n            \"Treaty Exposed Limit\",\r\n            \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://Alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"Alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}

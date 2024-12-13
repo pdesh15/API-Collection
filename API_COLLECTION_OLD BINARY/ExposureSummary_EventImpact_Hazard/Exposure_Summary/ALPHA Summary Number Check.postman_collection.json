@@ -1,0 +1,3754 @@
+{
+	"info": {
+		"_postman_id": "a47efd8a-595e-4929-a34a-6e61ed9a6a72",
+		"name": "ALPHA Summary Number Check",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33412147"
+	},
+	"item": [
+		{
+			"name": "Authentication and Authorization",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();  \r",
+							"pm.collectionVariables.set(\"token\", jsonData.token);\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-forwarded-for",
+						"value": "152.58.201.217",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n \"email\": \"nkumar@eigenrisk.com\",\r\n  \"apiKey\": \"789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/apiLogin",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"apiLogin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis OM 2212 - Fleet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23511,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n        \"AssetModel\": \"ERBASICS\",\r\n        \"FilterList\": [\r\n          {\r\n            \"AndOr\": \"AND\",\r\n            \"FilterList\": [\r\n              {\r\n                \"AssetType\": \"Site\",\r\n                \"Attribute\": \"Cause Of Loss\",\r\n                \"Operator\": \"EQ\",\r\n                \"Value\": \"EQXX\",\r\n                \"AndOr\": \"OR\"\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      },\r\n            \"quantile\": 50\r\n            \r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis without event Asset Count\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(1452078);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 1452078, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"#Contracts\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(1599);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 1599, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"TIV\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(10294010401279.742);\r",
+							"  console.log(\"TIV Value is matching Expected: 10294010401279.742, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Gross Exposed Limit\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(4886381002.728502);\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 4886381002.728502, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"GroundUpLoss\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"ContractLoss_Value All Types_GL\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Exposed Limit\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]).to.eql(4886381002.728487);\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 4886381002.728487, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net Pre Cat Loss\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(4886381002.728487);\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 4886381002.728487, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Net of Fac Loss\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac Exposed Limit\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Fac loss\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Exposed Limit\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for \"Treaty Loss\"\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis without event Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis - OM 2212 - Fleet Real time Earthquake MMI Shakemaps",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23511,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"DamageFunctionID\": 100022,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQXX\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50,\r\n            \"Events\": [\r\n                {\r\n                    \"EventID\": 1529919,\r\n                    \"SeverityModelID\": 47\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary Real Time",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Asset Count\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(927);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 927, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Contracts Count\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Contracts Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(53);\r",
+							"  console.log(\"Contracts Count Value is matching Expected: 53, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event TIV\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(3352263592.2495);\r",
+							"  console.log(\"TIV Value is matching Expected: 3352263592.2495, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Gross Exposed Limit\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(10808269.697360063);\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 10808269.697360063, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Ground Up Loss\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Ground Up Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(17225.879007567157);\r",
+							"  console.log(\"Ground Up Loss Value is matching Expected: 17225.879007567157, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]).to.eql(10808269.697360065);\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 10808269.697360065, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Net Pre Cat Loss\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(10808269.697360065);\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 10808269.697360065, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Net of Fac Loss\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Fac Exposed Limit\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Fac loss\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Treaty Exposed Limit\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Treaty Loss\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Om 2212 - Fleet analysis with Real Time event Underlying Loss\r",
+							"pm.test(\"Validating Om 2212 - Fleet analysis with Real Time event Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"]).to.eql(3.4733402931297414e-305);\r",
+							"  console.log(\"Underlying Loss is matching Expected: 3.4733402931297414e-305, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Loss\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis -OM 2212 - Fleet  Historical M 6.4 - 15km WSW of Ferndale, CA (PGV; Version: 13; nc73821036)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23511,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"DamageFunctionID\":101,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQXX\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50,\r\n            \"Events\": [\r\n                {\r\n                    \"EventID\": 1422779,\r\n                    \"SeverityModelID\": 46\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary Historical",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"// Validating Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(19508);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 19508, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Contracts Count\r",
+							"pm.test(\"Validating Contracts Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(233);\r",
+							"  console.log(\"Contracts Count Value is matching Expected: 233, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"].toFixed(3)).to.eql(139628636549.24362.toFixed(3));\r",
+							"  console.log(\"TIV Value is matching Expected: 139628636549.24362, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(3)).to.eql(253873377.38548815.toFixed(3));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 253873377.38548815, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Ground Up Loss\r",
+							"pm.test(\"Validating Ground Up Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"].toFixed(3)).to.eql(34220077.645934954.toFixed(3));\r",
+							"  console.log(\"Ground Up Loss Value is matching Expected: 34220077.645934954, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(3)).to.eql(253873377.3854881.toFixed(3));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 253873377.3854881, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(3)).to.eql(253873377.3854881.toFixed(3));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 253873377.3854881, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating Underlying Loss\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"].toFixed(3)).to.eql(119287.797.toFixed(3));\r",
+							"  console.log(\"Underlying Loss is matching Expected: 103290.71907871561, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"Gross Loss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis Eigen_Sample_EQTO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23512,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n        \"AssetModel\": \"ERBASICS\",\r\n        \"FilterList\": [\r\n          {\r\n            \"AndOr\": \"AND\",\r\n            \"FilterList\": [\r\n              {\r\n                \"AssetType\": \"Site\",\r\n                \"Attribute\": \"Cause Of Loss\",\r\n                \"Operator\": \"EQ\",\r\n                \"Value\": \"EQXX\",\r\n                \"AndOr\": \"OR\"\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      },\r\n            \"quantile\": 50\r\n            \r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(100000);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 100000, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for #Contracts\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(15784);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 15784, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(523807959962);\r",
+							"  console.log(\"TIV Value is matching Expected: 523807959962, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(64053838785);\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 64053838785, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GroundUpLoss\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(3)).to.eql(44246886887.741196.toFixed(3));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 44246886887.741196, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(63303838785);\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 63303838785, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(750000000);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 750000000, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"].toFixed(3)).to.eql(19056951897.258804.toFixed(3));\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 19056951897.258804, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n         \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"Gross Loss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authentication and Authorization Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();  \r",
+							"pm.collectionVariables.set(\"token\", jsonData.token);\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-forwarded-for",
+						"value": "152.58.201.217",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n \"email\": \"nkumar@eigenrisk.com\",\r\n  \"apiKey\": \"789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/apiLogin",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"apiLogin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis - Eigen_Sample_EQTO Real time Earthquake MMI Shakemaps",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23512,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"DamageFunctionID\":100022,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQXX\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50,\r\n            \"Events\": [\r\n                {\r\n                    \"EventID\": 1507078,\r\n                    \"SeverityModelID\": 47\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(1126);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 1126, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for #Contracts\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(190);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 190, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(5876340189);\r",
+							"  console.log(\"TIV Value is matching Expected: 5876340189, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(3)).to.eql(2884629106.0000005.toFixed(3));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 2884629106.0000005, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GroundUpLoss\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(3)).to.eql(1987112497.2155325.toFixed(3));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 1987112497.2155325, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(3)).to.eql(2876229106.0000005.toFixed(3));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 2876229106, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(8400000);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 8400000, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"].toFixed(3)).to.eql(889116608.784.toFixed(3));\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 851619641.6637994, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Underlying Loss\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"]).to.eql(3.46978017495613e-304);\r",
+							"  console.log(\"Underlying Loss Value is matching Expected: 3.46978017495613e-304, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"Gross Loss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis -  Eigen_Sample_EQTO Hazard - GSHAP Global Seismic Hazard Map (PGA 10% in 50 Years)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23512,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQXX\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50,\r\n            \"Events\": [\r\n                {\r\n                    \"EventID\": 827959,\r\n                    \"SeverityModelID\": 469\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(100000);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 100000, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for #Contracts\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(15784);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 15784, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(523807959962);\r",
+							"  console.log(\"TIV Value is matching Expected: 523807959962, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(64053838785);\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 64053838785, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GroundUpLoss\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(-1);\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: -1, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(3)).to.eql(44246886887.741196.toFixed(3));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 44246886887.741196, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(63303838785);\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 63303838785, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(750000000);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 750000000, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"].toFixed(3)).to.eql(19056951897.259317654.toFixed(3));\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 19056951897.259654, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Underlying Loss\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"]).to.eql(0);\r",
+							"  console.log(\"Underlying Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"Gross Loss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis HCC_MRN_ALL",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23513,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n        \"AssetModel\": \"ERBASICS\",\r\n        \"FilterList\": [\r\n          {\r\n            \"AndOr\": \"AND\",\r\n            \"FilterList\": [\r\n              {\r\n                \"AssetType\": \"Site\",\r\n                \"Attribute\": \"Cause Of Loss\",\r\n                \"Operator\": \"EQ\",\r\n                \"Value\": \"STXX\",\r\n                \"AndOr\": \"OR\"\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      },\r\n            \"quantile\": 50\r\n            \r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(14625);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 14625, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for #Contracts\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(10);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 10, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"].toFixed(4)).to.eql(1346170403.8000002.toFixed(4));\r",
+							"  console.log(\"TIV Value is matching Expected: 1346170403.8000002, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(56918430.93412161.toFixed(4));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 56918430.93412161, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GroundUpLoss\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(56918430.93412161.toFixed(4));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 56918430.93412161, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(56918430.93412161.toFixed(4));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 56918430.93412161, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Underlying Loss\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"]).to.eql(0);\r",
+							"  console.log(\"Underlying Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n                \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"Gross Loss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis - HCC_MRN_ALL Historical andrew",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23513,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"FLXX\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50,\r\n            \"Events\": [\r\n                {\r\n                    \"EventID\": 4098,\r\n                    \"SeverityModelID\": 44\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary HCC_MRN_ALL Historical",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(11);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 11, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for #Contracts\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(1);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 1, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"].toFixed(4)).to.eql(14981879.360000001.toFixed(4));\r",
+							"  console.log(\"TIV Value is matching Expected: 14981879.360000001, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(438299.9986410141.toFixed(4));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 438299.9986410141, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GroundUpLoss\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(-1);\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: -1, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(438299.99864101404.toFixed(4));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 438299.99864101404, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(438299.99864101404.toFixed(4));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 438299.99864101404, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Underlying Loss\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"].toFixed(4)).to.eql(2.0025664726564812e-307.toFixed(4));\r",
+							"  console.log(\"Underlying Loss Value is matching Expected: 2.0025664726564812e-307, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"Gross Loss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis -HCC_MRN_ALL  Realistic M 7.0 - Haywired M7.05 Scenario (MMI; haywiredm7.05_se)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23513,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQXX\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50,\r\n            \"Events\": [\r\n                {\r\n                    \"EventID\": 240117,\r\n                    \"SeverityModelID\": 47,\r\n                    \"DamageFunctionID\":100022\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary HCC_MRN_ALL Realistic",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(3);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 3, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for #Contracts\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(1);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 1, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(292307.74);\r",
+							"  console.log(\"TIV Value is matching Expected: 292307.74, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(12811.84820447579.toFixed(4));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 12811.84820447579, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GroundUpLoss\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(-1);\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: -1, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(12811.84820447579.toFixed(4));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 12811.84820447579, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(12811.84820447579.toFixed(4));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 12811.84820447579, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Underlying Loss\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"].toFixed(4)).to.eql(2.0025664726564812e-307.toFixed(4));\r",
+							"  console.log(\"Underlying Loss Value is matching Expected: 2.0025664726564812e-307, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n               \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"Gross Loss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis PURE_PA_FL(Copy)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23514,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n        \"AssetModel\": \"ERBASICS\",\r\n        \"FilterList\": [\r\n          {\r\n            \"AndOr\": \"AND\",\r\n            \"FilterList\": [\r\n              {\r\n                \"AssetType\": \"Site\",\r\n                \"Attribute\": \"Cause Of Loss\",\r\n                \"Operator\": \"EQ\",\r\n                \"Value\": \"FLXX\",\r\n                \"AndOr\": \"OR\"\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      },\r\n            \"quantile\": 50\r\n            \r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary PURE_PA_FL(Copy)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(209254);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 209254, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for #Contracts\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(78954);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 78954, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(9885124681.15);\r",
+							"  console.log(\"TIV Value is matching Expected: 9885124681.15, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(9657285131.150002.toFixed(4));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 9657285131.150002, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GroundUpLoss\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(9657285131.150002.toFixed(4));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 9657285131.150002, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(9657285131.150002.toFixed(4));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 9657285131.150002, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Underlying Loss\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"]).to.eql(0);\r",
+							"  console.log(\"Underlying Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"Gross Loss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authentication and Authorization Copy 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();  \r",
+							"pm.collectionVariables.set(\"token\", jsonData.token);\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-forwarded-for",
+						"value": "152.58.201.217",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n \"email\": \"nkumar@eigenrisk.com\",\r\n  \"apiKey\": \"789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/apiLogin",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"apiLogin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis -PURE_PA_FL(Copy) Real time WPC 3-Day Excessive Rainfall Outlook valid from 2023-10-04 1600 UTC to 2023-10-07 1200 UTC",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23514,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"DamageFunctionID\":100043,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"FLXX\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50,\r\n            \"Events\": [\r\n                {\r\n                    \"EventID\": 1565309,\r\n                    \"SeverityModelID\": 384\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary PURE_PA_FL(Copy) Real time",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event #Contracts\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(1755);\r",
+							"  console.log(\"#Contracts Value is matching. Expected: 1755, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Analysis Currency\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Analysis Currency\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Analysis Currency\"]).to.eql(\"USD\");\r",
+							"  console.log(\"Analysis Currency Value is matching. Expected: USD, Current: \", responseJson.Value.Analysis0[\"Analysis Currency\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Asset Count\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(4637);\r",
+							"  console.log(\"Asset Count Value is matching. Expected: 4637, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event ContractLoss_Value All Types_EL\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event ContractLoss_Value All Types_EL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_EL\"]).to.eql(250537707.54);\r",
+							"  console.log(\"ContractLoss_Value All Types_EL is matching. Expected: 250537707.54, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_EL\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"].toFixed(4)).to.eql(5790713.660166567.toFixed(4));\r",
+							"  console.log(\"ContractLoss_Value All Types_GL is matching. Expected: 5790713.660166567, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Deductible\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Deductible\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Deductible\"]).to.eql(5541750);\r",
+							"  console.log(\"Deductible Value is matching. Expected: 5541750, Current: \", responseJson.Value.Analysis0[\"Deductible\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event ExposedGrossLimit\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event ExposedGrossLimit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ExposedGrossLimit\"]).to.eql(250537707.54);\r",
+							"  console.log(\"ExposedGrossLimit Value is matching. Expected: 250537707.54, Current: \", responseJson.Value.Analysis0[\"ExposedGrossLimit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Fac Exposed Limit\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Fac loss\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Gross Exposed Limit\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"]).to.eql(250537707.54);\r",
+							"  console.log(\"Gross Exposed Limit Value is matching. Expected: 250537707.54, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Gross Loss\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Gross Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Loss\"].toFixed(4)).to.eql(5790713.660166567.toFixed(4));\r",
+							"  console.log(\"Gross Loss Value is matching. Expected: 5790713.660166567, Current: \", responseJson.Value.Analysis0[\"Gross Loss\"]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event GroundUpLoss\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"].toFixed(4)).to.eql(7120401.425341537.toFixed(4));\r",
+							"  console.log(\"GroundUpLoss Value is matching. Expected: 7120401.425341537, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]).to.eql(250537707.54);\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching. Expected: 250537707.54, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]).to.eql(250537707.54);\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching. Expected: 250537707.54, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Net of Fac Loss\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"].toFixed(4)).to.eql(5790713.660166567.toFixed(4));\r",
+							"  console.log(\"Net of Fac Loss Value is matching. Expected: 5790713.660166567, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event TIV\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(256079457.54);\r",
+							"  console.log(\"TIV Value is matching. Expected: 256079457.54, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Treaty Exposed Limit\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Treaty Loss\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating PURE_PA_FL(Copy) Analysis Without Event Underlying Loss\r",
+							"pm.test(\"Validating PURE_PA_FL(Copy) Analysis Without Event Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"].toFixed(4)).to.eql(5790713.660166567.toFixed(4));\r",
+							"  console.log(\"Underlying Loss Value is matching. Expected: 5790713.660166567, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis 12312021 Booked All RB(Copy)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23515,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n        \"AssetModel\": \"ERBASICS\",\r\n        \"FilterList\": [\r\n          {\r\n            \"AndOr\": \"AND\",\r\n            \"FilterList\": [\r\n              {\r\n                \"AssetType\": \"Site\",\r\n                \"Attribute\": \"Cause Of Loss\",\r\n                \"Operator\": \"EQ\",\r\n                \"Value\": \"EQXX\",\r\n                \"AndOr\": \"OR\"\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      },\r\n            \"quantile\": 50\r\n            \r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary 12312021 Booked All RB(Copy)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating Asset Count\r",
+							"pm.test(\"Validating Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(542536);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 542536, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for #Contracts\r",
+							"pm.test(\"Validating #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(733);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 733, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for TIV\r",
+							"pm.test(\"Validating TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"].toFixed(3)).to.eql(3217803045004.457.toFixed(3));\r",
+							"  console.log(\"TIV Value is matching Expected: 3217803045004.457, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Gross Exposed Limit\r",
+							"pm.test(\"Validating Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(8843760316.689903.toFixed(4));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 8843760316.689903, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for GroundUpLoss\r",
+							"pm.test(\"Validating GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(8215012424.232077.toFixed(4));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 8215012424.232077, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net Pre Cat Loss\r",
+							"pm.test(\"Validating Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(8215012424.232077.toFixed(4));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 8215012424.232077, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Net of Fac Loss\r",
+							"pm.test(\"Validating Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac Exposed Limit\r",
+							"pm.test(\"Validating Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"].toFixed(4)).to.eql(628747892.4578278.toFixed(4));\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 628747892.4578278, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Fac loss\r",
+							"pm.test(\"Validating Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Exposed Limit\r",
+							"pm.test(\"Validating Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Treaty Loss\r",
+							"pm.test(\"Validating Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Underlying Loss\r",
+							"pm.test(\"Validating Underlying Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Underlying Loss\"].toFixed(4)).to.eql(2.8925960160593618e-307.toFixed(4));\r",
+							"  console.log(\"Underlying Loss Value is matching Expected: 2.8925960160593618e-307, Current: \", responseJson.Value.Analysis0[\"Underlying Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Assertion for Layer Premium\r",
+							"pm.test(\"Validating Layer Premium\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Layer Premium\"].toFixed(4)).to.eql(44062229.462388285.toFixed(4));\r",
+							"  console.log(\"Layer Premium Value is matching Expected: 44062229.462388285, Current: \", responseJson.Value.Analysis0[\"Layer Premium\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis -12312021 Booked All RB(Copy) Real time Earthquake MMI Shakemaps",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23515,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"DamageFunctionID\":100022,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQXX\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50,\r\n            \"Events\": [\r\n                {\r\n                    \"EventID\": 1510758,\r\n                    \"SeverityModelID\": 47\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary 12312021 Booked All RB(Copy) Real Time",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - #Contracts\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(107);\r",
+							"    console.log(\"#Contracts is matching. Expected: 107, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Asset Count\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(4758);\r",
+							"    console.log(\"Asset Count is matching. Expected: 4758, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - TIV\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"TIV\"].toFixed(4)).to.eql(46531727008.839424.toFixed(4));\r",
+							"    console.log(\"TIV is matching. Expected: 46531727008.839424, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Gross Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(281238983.20720303.toFixed(4));\r",
+							"    console.log(\"Gross Exposed Limit is matching. Expected: 281238983.20720303, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - GroundUpLoss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"    console.log(\"GroundUpLoss is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - ContractLoss_Value All Types_GL\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"    console.log(\"ContractLoss_Value All Types_GL is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Net Pre Cat Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(220436483.6577396.toFixed(4));\r",
+							"    console.log(\"Net Pre Cat Exposed Limit is matching. Expected: 220436483.6577396, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Net Pre Cat Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net Pre Cat Loss is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Net of Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(220436483.6577396.toFixed(4));\r",
+							"    console.log(\"Net of Fac Exposed Limit is matching. Expected: 220436483.6577396, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Net of Fac Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net of Fac Loss is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"].toFixed(4)).to.eql(60802499.549463384.toFixed(4));\r",
+							"    console.log(\"Fac Exposed Limit is matching. Expected: 60802499.549463384, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Fac loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"    console.log(\"Fac loss is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Treaty Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Exposed Limit is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Treaty Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Loss is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis - 12312021 Booked All RB(Copy) Historical M 6.4 - 15km WSW of Ferndale, CA (PGV; Version: 13; nc73821036)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23515,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQXX\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50,\r\n            \"Events\": [\r\n                {\r\n                    \"EventID\": 1422779,\r\n                    \"SeverityModelID\": 46\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary 12312021 Booked All RB(Copy) Historical",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - #Contracts\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(110);\r",
+							"    console.log(\"#Contracts is matching. Expected: 110, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Asset Count\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(9869);\r",
+							"    console.log(\"Asset Count is matching. Expected: 9869, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - TIV\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"TIV\"].toFixed(4)).to.eql(42872189075.95779.toFixed(4));\r",
+							"    console.log(\"TIV is matching. Expected: 42872189075.95779, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Gross Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(285487271.9886091.toFixed(4));\r",
+							"    console.log(\"Gross Exposed Limit is matching. Expected: 285487271.9886091, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - GroundUpLoss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(-1);\r",
+							"    console.log(\"GroundUpLoss is matching. Expected: -1, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - ContractLoss_Value All Types_GL\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"    console.log(\"ContractLoss_Value All Types_GL is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Net Pre Cat Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(226506867.44043377.toFixed(4));\r",
+							"    console.log(\"Net Pre Cat Exposed Limit is matching. Expected: 226506867.44043377, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Net Pre Cat Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net Pre Cat Loss is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Net of Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(226506867.44043377.toFixed(4));\r",
+							"    console.log(\"Net of Fac Exposed Limit is matching. Expected: 226506867.44043377, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Net of Fac Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"    console.log(\"Net of Fac Loss is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Fac Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"].toFixed(4)).to.eql(58980404.54817532.toFixed(4));\r",
+							"    console.log(\"Fac Exposed Limit is matching. Expected: 58980404.54817532, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Fac loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"    console.log(\"Fac loss is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Treaty Exposed Limit\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Exposed Limit is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating HCC_EVC_ALL(Copy) without event - Treaty Loss\", () => {\r",
+							"    pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"    console.log(\"Treaty Loss is matching. Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authentication and Authorization Copy 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();  \r",
+							"pm.collectionVariables.set(\"token\", jsonData.token);\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-forwarded-for",
+						"value": "152.58.201.217",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n \"email\": \"nkumar@eigenrisk.com\",\r\n  \"apiKey\": \"789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/apiLogin",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"apiLogin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis HCC_PED_TME(Copy)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\":23433,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n        \"AssetModel\": \"ERBASICS\",\r\n        \"FilterList\": [\r\n          {\r\n            \"AndOr\": \"AND\",\r\n            \"FilterList\": [\r\n              {\r\n                \"AssetType\": \"Site\",\r\n                \"Attribute\": \"Cause Of Loss\",\r\n                \"Operator\": \"EQ\",\r\n                \"Value\": \"EQXX\",\r\n                \"AndOr\": \"OR\"\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      },\r\n            \"quantile\": 50\r\n            \r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Asset Count\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(13135);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 13135, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event #Contracts\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(202);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 202, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event TIV\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"].toFixed(4)).to.eql(1490932908168.0498.toFixed(4));\r",
+							"  console.log(\"TIV Value is matching Expected: 1490932908168.0498, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Gross Exposed Limit\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(9233375988.158142.toFixed(4));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 9233375988.158142, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event GroundUpLoss\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(8589246723.529638.toFixed(4));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 8589246723.529638, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Net Pre Cat Loss\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(8589246723.529638.toFixed(4));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 8589246723.529638, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Net of Fac Loss\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Fac Exposed Limit\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"].toFixed(4)).to.eql(644129264.6285031.toFixed(4));\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 644129264.6285031, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Fac loss\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Treaty Exposed Limit\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Treaty Loss\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis - HCC_PED_TME(Copy) - Fleet Real time Earthquake MMI Shakemaps",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23433,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"DamageFunctionID\": 100025,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"TCXX\",\r\n                                \"AndOr\": \"AND\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50,\r\n            \"Events\": [\r\n                {\r\n                    \"EventID\": 4098,\r\n                    \"SeverityModelID\": 44\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary Real Time  HCC_PED_TME(Copy)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Asset Count\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(61);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 61, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event #Contracts\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(8);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 8, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event TIV\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"].toFixed(4)).to.eql(286844320.4926238.toFixed(4));\r",
+							"  console.log(\"TIV Value is matching Expected: 286844320.4926238, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event GroundUpLoss\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"].toFixed(4)).to.eql(9498756.590892397.toFixed(4));\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: 9498756.590892397, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Fac Exposed Limit\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating HCC_PED_TME(Copy) analysis without event Fac loss\r",
+							"pm.test(\"Validating HCC_PED_TME(Copy) analysis without event Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Loss\",\r\n        \"Gross Exposed Limit\",\r\n        \"Gross Loss\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis 510 OM Live 2112(Copy)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23283,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"ExposureFilterSets\": {\r\n        \"AssetModel\": \"ERBASICS\",\r\n        \"FilterList\": [\r\n          {\r\n            \"AndOr\": \"AND\",\r\n            \"FilterList\": [\r\n              {\r\n                \"AssetType\": \"Site\",\r\n                \"Attribute\": \"Cause Of Loss\",\r\n                \"Operator\": \"EQ\",\r\n                \"Value\": \"EQXX\",\r\n                \"AndOr\": \"OR\"\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      },\r\n            \"quantile\": 50\r\n            \r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event Asset Count\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(990274);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 990274, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event #Contracts\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(1382);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 1382, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event TIV\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"]).to.eql(8733898414758.801);\r",
+							"  console.log(\"TIV Value is matching Expected: 8733898414758.801, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event Gross Exposed Limit\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(3570992983.1390505.toFixed(4));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 3570992983.1390505, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event GroundUpLoss\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"]).to.eql(0);\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(2112693344.3787034.toFixed(4));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 2112693344.3787034, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event Net Pre Cat Loss\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(3570992983.1390514.toFixed(4));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 3570992983.1390514, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event Net of Fac Loss\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event Fac Exposed Limit\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event Fac loss\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event Gross Loss\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event Gross Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Loss\"]).to.eql(0);\r",
+							"  console.log(\"Gross Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Gross Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event Treaty Exposed Limit\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"].toFixed(4)).to.eql(1458299638.7603483.toFixed(4));\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 1458299638.7603483, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis without event Treaty Loss\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis without event Treaty Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Loss\"]).to.eql(0);\r",
+							"  console.log(\"Treaty Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Treaty Loss\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Gross Loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set analysis - 510 OM Live 2112(Copy)  Real time Earthquake MMI Shakemaps Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"setTimeout(function() {\r",
+							"    console.log(\"Next API Call After 3 Minutes \")\r",
+							"}, 180000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Exposure\": {\r\n        \"id\": 23283,\r\n        \"object_sub_type\": \"portfolio\"\r\n    },\r\n    \"analysisObject\": [\r\n        {\r\n            \"CurrencyCode\": \"USD\",\r\n            \"IncludeAllContracts\": true,\r\n            \"damageAdjustment\": 1,\r\n            \"ValuationTypeCode\": 1,\r\n            \"DamageFunctionID\": 100022,\r\n            \"ExposureFilterSets\": {\r\n                \"AssetModel\": \"ERBASICS\",\r\n                \"FilterList\": [\r\n                    {\r\n                        \"AndOr\": \"AND\",\r\n                        \"FilterList\": [\r\n                            {\r\n                                \"AssetType\": \"Site\",\r\n                                \"Attribute\": \"Cause Of Loss\",\r\n                                \"Operator\": \"EQ\",\r\n                                \"Value\": \"EQXX\",\r\n                                \"AndOr\": \"OR\"\r\n                            }\r\n                        ]\r\n                    }\r\n                ]\r\n            },\r\n            \"quantile\": 50,\r\n            \"Events\": [\r\n                {\r\n                    \"EventID\": 1529919,\r\n                    \"SeverityModelID\": 47\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/load-exposure",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"load-exposure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exposure Summary Real Time",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event Asset Count\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event Asset Count\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Asset Count\"]).to.eql(188);\r",
+							"  console.log(\"Asset Count Value is matching Expected: 188, Current: \", responseJson.Value.Analysis0[\"Asset Count\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event #Contracts\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event #Contracts\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"#Contracts\"]).to.eql(39);\r",
+							"  console.log(\"#Contracts Value is matching Expected: 39, Current: \", responseJson.Value.Analysis0[\"#Contracts\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event TIV\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event TIV\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"TIV\"].toFixed(4)).to.eql(7220135026.179382.toFixed(4));\r",
+							"  console.log(\"TIV Value is matching Expected: 7220135026.179382, Current: \", responseJson.Value.Analysis0[\"TIV\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event Gross Exposed Limit\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event Gross Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Exposed Limit\"].toFixed(4)).to.eql(9075228.789523887.toFixed(4));\r",
+							"  console.log(\"Gross Exposed Limit Value is matching Expected: 9075228.789523887, Current: \", responseJson.Value.Analysis0[\"Gross Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event GroundUpLoss\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event GroundUpLoss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"GroundUpLoss\"].toFixed(4)).to.eql(11463.586933653023.toFixed(4));\r",
+							"  console.log(\"GroundUpLoss Value is matching Expected: 11463.586933653023, Current: \", responseJson.Value.Analysis0[\"GroundUpLoss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event ContractLoss_Value All Types_GL\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event ContractLoss_Value All Types_GL\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]).to.eql(0);\r",
+							"  console.log(\"ContractLoss_Value All Types_GL is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"ContractLoss_Value All Types_GL\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event Net Pre Cat Exposed Limit\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event Net Pre Cat Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"].toFixed(4)).to.eql(5246939.567922251.toFixed(4));\r",
+							"  console.log(\"Net Pre Cat Exposed Limit Value is matching Expected: 5246939.567922251, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event Net Pre Cat Loss\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event Net Pre Cat Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net Pre Cat Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net Pre Cat Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event Net of Fac Exposed Limit\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event Net of Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"].toFixed(4)).to.eql(9075228.789523888.toFixed(4));\r",
+							"  console.log(\"Net of Fac Exposed Limit Value is matching Expected: 9075228.789523888, Current: \", responseJson.Value.Analysis0[\"Net of Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event Net of Fac Loss\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event Net of Fac Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Net of Fac Loss\"]).to.eql(0);\r",
+							"  console.log(\"Net of Fac Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Net of Fac Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event Fac Exposed Limit\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event Fac Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac Exposed Limit\"]).to.eql(0);\r",
+							"  console.log(\"Fac Exposed Limit Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac Exposed Limit\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event Fac loss\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event Fac loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Fac loss\"]).to.eql(0);\r",
+							"  console.log(\"Fac loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Fac loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event Gross Loss\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event Gross Loss\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Gross Loss\"]).to.eql(0);\r",
+							"  console.log(\"Gross Loss Value is matching Expected: 0, Current: \", responseJson.Value.Analysis0[\"Gross Loss\"]);\r",
+							"});\r",
+							"\r",
+							"// Validating 510 OM Live 2112(Copy) analysis with event Treaty Exposed Limit\r",
+							"pm.test(\"Validating 510 OM Live 2112(Copy) analysis with event Treaty Exposed Limit\", () => {\r",
+							"  pm.expect(responseJson.Value.Analysis0[\"Treaty Exposed Limit\"].toFixed(4)).to.eql(3828289.221601635.toFixed(4));\r",
+							"  console.log(\"Treaty Exposed Limit Value is matching Expected: 3828289.221601635, Current: \", responseJson.Value.Analysis0[\"Treaty Exposed Limit\"]);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"measures\": [\r\n        \"Asset Count\",\r\n        \"#Contracts\",\r\n        \"TIV\",\r\n        \"Gross Loss\",\r\n        \"Gross Exposed Limit\",\r\n        \"GroundUpLoss\",\r\n        \"ContractLoss_Value All Types_GL\",\r\n        \"Net Pre Cat Exposed Limit\",\r\n        \"Net Pre Cat Loss\",\r\n        \"Net of Fac Exposed Limit\",\r\n        \"Net of Fac Loss\",\r\n        \"Fac Exposed Limit\",\r\n        \"Fac loss\",\r\n        \"Treaty Exposed Limit\",\r\n        \"Treaty Loss\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://alpha-api.eigenrisk.com/analysis/summary",
+					"protocol": "https",
+					"host": [
+						"alpha-api",
+						"eigenrisk",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}
